@@ -12,6 +12,13 @@ app.config['STATIC_IMAGE_FOLDER'] = os.path.join('static', 'converted_images')
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['STATIC_IMAGE_FOLDER'], exist_ok=True)
 
+def clear_folder(folder_path):
+    """Delete all files in a given folder."""
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -20,6 +27,7 @@ def index():
 def image_to_word():
     file = request.files.get('image')
     if file:
+        clear_folder(app.config['UPLOAD_FOLDER'])  # Clean up before saving
         filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
         output_path = filename + ".docx"
@@ -32,24 +40,25 @@ def image_to_word():
 def word_to_image():
     file = request.files.get('docx')
     if file:
+        clear_folder(app.config['UPLOAD_FOLDER'])          # Clean uploads
+        clear_folder(app.config['STATIC_IMAGE_FOLDER'])    # Clean images
+
         filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
-        
-        # Save images inside the static folder
+
         output_folder = app.config['STATIC_IMAGE_FOLDER']
         os.makedirs(output_folder, exist_ok=True)
-        
+
         image_paths = convert_docx_to_images(filename, output_folder)
-        
-        # Safely generate URLs for static images (fix path slashes)
+
+        # Safely generate URLs for static images
         image_urls = [
             url_for('static', filename=os.path.relpath(path, 'static').replace('\\', '/'))
-            for path in image_paths
-            if os.path.exists(path)
+            for path in image_paths if os.path.exists(path)
         ]
-        
+
         return render_template('index.html', image_paths=image_urls)
-    
+
     flash("Please upload a DOCX file.")
     return redirect(url_for('index'))
 
