@@ -32,6 +32,7 @@
     {% if image_paths %}
       <div class="results">
         <h2>🖼️ Converted Images:</h2>
+        <a href="{{ url_for('download_zip') }}" class="download-zip-btn">⬇️ Download All as ZIP</a>
         {% for image in image_paths %}
           <div class="image-card">
             <img src="{{ image }}" alt="Converted Image">
