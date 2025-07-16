@@ -17,8 +17,8 @@ COPY . /app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Expose the port your app runs on
-EXPOSE 10000
+# Expose a generic port (Render injects the real one)
+EXPOSE 8080
 
-# Start your Flask app with waitress
-CMD ["waitress-serve", "--host=0.0.0.0", "--port=10000", "app:app"]
+# ✅ Fix: Start Flask app using Render's assigned port
+CMD ["sh", "-c", "waitress-serve --host=0.0.0.0 --port=${PORT} app:app"]
