@@ -1,6 +1,10 @@
 services:
   - type: web
-    name: Doc-Converter-App-Viin
-    env: docker
-    plan: free
-    dockerfilePath: ./Dockerfile
+    name: doc-converter-app
+    env: python
+    buildCommand: |
+      apt-get update && apt-get install -y tesseract-ocr && pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
