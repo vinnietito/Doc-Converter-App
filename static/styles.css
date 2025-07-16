@@ -118,3 +118,18 @@ img {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+.download-zip-btn {
+  display: inline-block;
+  background-color: #0077cc;
+  color: #fff;
+  padding: 10px 16px;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  transition: background 0.3s;
+}
+
+.download-zip-btn:hover {
+  background-color: #005fa3;
+}
