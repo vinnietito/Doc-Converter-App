@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>📝 Document Converter</h1>
+
+    <h2>Convert Image to Word</h2>
+    <form action="/convert-image" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Convert to .docx</button>
+    </form>
+
+    <h2>Convert Word to Image</h2>
+    <form action="/convert-word" method="POST" enctype="multipart/form-data">
+        <input type="file" name="docx" accept=".docx" required>
+        <button type="submit">Convert to Images</button>
+    </form>
+
+    {% if image_paths %}
+        <h2>Converted Images</h2>
+        {% for path in image_paths %}
+            <img src="{{ path }}" width="300"><br>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
