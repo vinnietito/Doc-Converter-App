@@ -1,30 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Document Converter</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <meta charset="UTF-8">
+  <title>Doc Converter</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>📝 Document Converter</h1>
+  <div class="container">
+    <h1>🌀 Doc Converter App</h1>
 
-    <h2>Convert Image to Word</h2>
-    <form action="/convert-image" method="POST" enctype="multipart/form-data">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="form-section">
+      <form action="/convert-image" method="POST" enctype="multipart/form-data">
+        <label>🖼️ Convert Image to Word:</label><br>
         <input type="file" name="image" accept="image/*" required>
-        <button type="submit">Convert to .docx</button>
-    </form>
+        <button type="submit">Convert to Word</button>
+      </form>
 
-    <h2>Convert Word to Image</h2>
-    <form action="/convert-word" method="POST" enctype="multipart/form-data">
+      <form action="/convert-word" method="POST" enctype="multipart/form-data">
+        <label>📄 Convert Word to Image:</label><br>
         <input type="file" name="docx" accept=".docx" required>
         <button type="submit">Convert to Images</button>
-    </form>
+      </form>
+    </div>
+
+    <div class="loader" id="loader">Converting...⏳</div>
 
     {% if image_paths %}
-        <h2>Converted Images</h2>
-        {% for path in image_paths %}
-            <img src="{{ path }}" width="300"><br>
+      <div class="results">
+        <h2>🖼️ Converted Images:</h2>
+        {% for image in image_paths %}
+          <div class="image-card">
+            <img src="{{ image }}" alt="Converted Image">
+            <a href="{{ image }}" download class="download-btn">Download</a>
+          </div>
         {% endfor %}
+      </div>
     {% endif %}
+  </div>
+
+  <script>
+    const forms = document.querySelectorAll("form");
+    const loader = document.getElementById("loader");
+
+    forms.forEach(form => {
+      form.addEventListener("submit", () => {
+        loader.style.display = "block";
+      });
+    });
+  </script>
 </body>
 </html>
