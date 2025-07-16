@@ -1,24 +1,30 @@
 import os
-import pythoncom
-from docx2pdf import convert
+import subprocess
 from pdf2image import convert_from_path
 
 def convert_docx_to_images(docx_path, output_folder):
-    # Initialize COM for Word Automation
-    pythoncom.CoInitialize()
+    # Ensure output folder exists
+    os.makedirs(output_folder, exist_ok=True)
 
-    # Add Poppler bin to PATH (TEMPORARY fix)
-    os.environ["PATH"] += os.pathsep + r"C:\Program Files\Poppler\poppler-24.08.0\Library\bin"  # 🔁 Edit this path
-
-    # Convert DOCX to PDF
+    # Convert DOCX to PDF using LibreOffice
     base_filename = os.path.splitext(os.path.basename(docx_path))[0]
     pdf_path = os.path.join(output_folder, base_filename + '.pdf')
-    convert(docx_path, pdf_path)
 
-    # Convert PDF to PNG images
+    try:
+        subprocess.run([
+            "libreoffice",
+            "--headless",
+            "--convert-to", "pdf",
+            "--outdir", output_folder,
+            docx_path
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"LibreOffice conversion failed: {e}")
+
+    # Convert the PDF to PNG images
     images = convert_from_path(pdf_path)
-
     image_paths = []
+
     for i, image in enumerate(images):
         image_path = os.path.join(output_folder, f'page_{i+1}.png')
         image.save(image_path, 'PNG')
