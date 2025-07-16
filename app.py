@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, send_file, redirect, url_for, flash
 import os
+import zipfile
+import io
 from utils.image_to_word import convert_image_to_word
 from utils.word_to_image import convert_docx_to_images
 
@@ -61,6 +63,24 @@ def word_to_image():
 
     flash("Please upload a DOCX file.")
     return redirect(url_for('index'))
+
+# ✅ NEW: Route to download all images as ZIP
+@app.route('/download-zip')
+def download_zip():
+    zip_stream = io.BytesIO()
+    with zipfile.ZipFile(zip_stream, 'w') as zipf:
+        image_dir = app.config['STATIC_IMAGE_FOLDER']
+        for filename in os.listdir(image_dir):
+            if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+                full_path = os.path.join(image_dir, filename)
+                zipf.write(full_path, arcname=filename)
+    zip_stream.seek(0)
+    return send_file(
+        zip_stream,
+        as_attachment=True,
+        download_name='converted_images.zip',
+        mimetype='application/zip'
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
