@@ -2,14 +2,11 @@ from PIL import Image
 import pytesseract
 from docx import Document
 import platform
-import os
 
-# 🧠 Set tesseract path conditionally based on OS
+# ✅ Only set tesseract path if running on Windows
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-else:
-    # Linux systems (e.g., Render) just need tesseract installed in system PATH
-    pytesseract.pytesseract.tesseract_cmd = "tesseract"
+# ⛔️ Do NOT override on Linux — use system PATH
 
 def convert_image_to_word(image_path, output_path):
     try:

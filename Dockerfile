@@ -1,22 +1,26 @@
-FROM python:3.11-slim
+# Use a lightweight Python base image
+FROM python:3.10-slim
 
-# Install system packages (LibreOffice and fonts)
+# Install system dependencies: tesseract and libreoffice
 RUN apt-get update && \
-    apt-get install -y libreoffice poppler-utils fonts-dejavu && \
-    apt-get clean
+    apt-get install -y \
+    tesseract-ocr \
+    libreoffice \
+    poppler-utils \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set workdir
+# Set the working directory
 WORKDIR /app
 
-# Copy files
+# Copy all project files into the container
 COPY . .
 
-# Install dependencies
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose port
-EXPOSE 8000
+EXPOSE 10000
 
-# Start the app using gunicorn
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
+# Run the app with Gunicorn
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
