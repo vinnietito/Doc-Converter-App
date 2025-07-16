@@ -29,8 +29,6 @@
       </form>
     </div>
 
-    <div class="loader" id="loader">Converting...⏳</div>
-
     {% if image_paths %}
       <div class="results">
         <h2>🖼️ Converted Images:</h2>
@@ -43,15 +41,20 @@
       </div>
     {% endif %}
   </div>
-  
+
+  <!-- Spinner Overlay -->
+  <div id="spinner-overlay">
+    <div class="spinner"></div>
+    <p>Converting, please wait... ⏳</p>
+  </div>
 
   <script>
     const forms = document.querySelectorAll("form");
-    const loader = document.getElementById("loader");
+    const spinner = document.getElementById("spinner-overlay");
 
     forms.forEach(form => {
       form.addEventListener("submit", () => {
-        loader.style.display = "block";
+        spinner.style.display = "flex";
       });
     });
   </script>
