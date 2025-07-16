@@ -1,28 +1,26 @@
+from docx import Document
+from PIL import Image, ImageDraw, ImageFont
 import os
-import subprocess
-from pdf2image import convert_from_path
+import textwrap
 
 def convert_docx_to_images(docx_path, output_folder):
-    # Generate PDF path
-    base_filename = os.path.splitext(os.path.basename(docx_path))[0]
-    pdf_path = os.path.join(output_folder, f"{base_filename}.pdf")
+    doc = Document(docx_path)
+    full_text = "\n".join([para.text for para in doc.paragraphs])
 
-    # Convert DOCX to PDF using LibreOffice (works on Linux)
-    subprocess.run([
-        "libreoffice",
-        "--headless",
-        "--convert-to", "pdf",
-        "--outdir", output_folder,
-        docx_path
-    ], check=True)
+    # Create an image (white background)
+    img = Image.new('RGB', (800, 1000), color='white')
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.load_default()
 
-    # Convert PDF to images
-    images = convert_from_path(pdf_path)
+    # Wrap text so it doesn't overflow
+    lines = textwrap.wrap(full_text, width=90)
+    y = 20
+    for line in lines:
+        draw.text((20, y), line, fill='black', font=font)
+        y += 20
 
-    image_paths = []
-    for i, image in enumerate(images):
-        image_path = os.path.join(output_folder, f"page_{i+1}.png")
-        image.save(image_path, "PNG")
-        image_paths.append(image_path)
+    os.makedirs(output_folder, exist_ok=True)
+    image_path = os.path.join(output_folder, 'page_1.png')
+    img.save(image_path)
 
-    return image_paths
+    return [image_path]
