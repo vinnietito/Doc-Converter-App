@@ -1,8 +1,6 @@
 services:
   - type: web
-    name: doc-converter-app
-    runtime: python
-    buildCommand: |
-      apt-get update && apt-get install -y libreoffice
-      pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    name: Doc-Converter-App-Viin
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
