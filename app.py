@@ -6,9 +6,11 @@ from utils.word_to_image import convert_docx_to_images
 app = Flask(__name__)
 app.secret_key = 'secret-key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['STATIC_IMAGE_FOLDER'] = os.path.join('static', 'converted_images')
 
-# Ensure upload folder exists
+# Ensure required folders exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['STATIC_IMAGE_FOLDER'], exist_ok=True)
 
 @app.route('/')
 def index():
@@ -32,10 +34,22 @@ def word_to_image():
     if file:
         filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
-        output_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'images')
+        
+        # Save images inside the static folder
+        output_folder = app.config['STATIC_IMAGE_FOLDER']
         os.makedirs(output_folder, exist_ok=True)
+        
         image_paths = convert_docx_to_images(filename, output_folder)
-        return render_template('index.html', image_paths=[url_for('static', filename=path.split('static/')[1]) for path in image_paths])
+        
+        # Safely generate URLs for static images
+        image_urls = [
+            url_for('static', filename=os.path.relpath(path, 'static'))
+            for path in image_paths
+            if os.path.exists(path)
+        ]
+        
+        return render_template('index.html', image_paths=image_urls)
+    
     flash("Please upload a DOCX file.")
     return redirect(url_for('index'))
 

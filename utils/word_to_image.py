@@ -1,17 +1,19 @@
 import os
-from pdf2image import convert_from_path
 from docx2pdf import convert
+from pdf2image import convert_from_path
 
 def convert_docx_to_images(docx_path, output_folder):
-    pdf_path = docx_path.replace(".docx", ".pdf")
+    # Convert DOCX to PDF
+    pdf_path = os.path.join(output_folder, "temp.pdf")
     convert(docx_path, pdf_path)
 
-    images = convert_from_path(pdf_path)
-    image_paths = []
+    # Convert PDF to images
+    images = convert_from_path(pdf_path, poppler_path=r"C:\Program Files\Poppler\poppler-24.08.0\Library\bin")
 
+    image_paths = []
     for i, img in enumerate(images):
-        img_path = os.path.join(output_folder, f"page_{i+1}.png")
-        img.save(img_path, 'PNG')
-        image_paths.append(img_path)
+        image_path = os.path.join(output_folder, f"page_{i + 1}.png")
+        img.save(image_path, "PNG")
+        image_paths.append(image_path)
 
     return image_paths
