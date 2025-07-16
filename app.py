@@ -41,9 +41,9 @@ def word_to_image():
         
         image_paths = convert_docx_to_images(filename, output_folder)
         
-        # Safely generate URLs for static images
+        # Safely generate URLs for static images (fix path slashes)
         image_urls = [
-            url_for('static', filename=os.path.relpath(path, 'static'))
+            url_for('static', filename=os.path.relpath(path, 'static').replace('\\', '/'))
             for path in image_paths
             if os.path.exists(path)
         ]
